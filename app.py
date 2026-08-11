@@ -5,12 +5,11 @@ import pickle
 st.title("Metric Mind: Analytics & Prediction")
 st.write("Analyze historical data and predict future outcomes.")
 
-# Load data and model
+
 df = pd.read_csv("data.csv")
 with open("model.pkl", "rb") as file:
     model = pickle.load(file)
 
-# Display historical data
 st.subheader("Historical Performance")
 st.line_chart(df.set_index("Student_ID")[["Score", "Mock_Test_Score"]])
 
