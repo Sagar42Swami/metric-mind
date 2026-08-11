@@ -2,7 +2,6 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 import pickle
 
-# 1. Load the data
 df = pd.read_csv("data.csv")
 
 # 2. Separate features (X) and target (y)
