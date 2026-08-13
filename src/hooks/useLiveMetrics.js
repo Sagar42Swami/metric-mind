@@ -18,7 +18,17 @@ export const useLiveMetrics = () => {
   // Initialize and subscribe
   useEffect(() => {
     // Generate initial historical seed data so charts are populated immediately
-    const seedData = dataEngine.generateHistory(60);
+    const rawSeedData = dataEngine.generateHistory(60);
+    const seedData = rawSeedData.map((pt, idx) => {
+      const prevPt = rawSeedData[idx - 1];
+      const deltas = { focus: 0, stress: 0, activity: 0, engagement: 0 };
+      if (prevPt) {
+        Object.keys(pt.metrics).forEach((key) => {
+          deltas[key] = pt.metrics[key] - prevPt.metrics[key];
+        });
+      }
+      return { ...pt, deltas };
+    });
     setHistory(seedData);
     
     // Set initial status
@@ -28,7 +38,59 @@ export const useLiveMetrics = () => {
     // Subscribe to telemetry ticks
     const unsubscribe = dataEngine.subscribe((event) => {
       if (event.type === 'METRIC_UPDATE') {
-        const newHistory = [...historyRef.current, event];
+        const prevPoint = historyRef.current[historyRef.current.length - 1];
+        const currentMetrics = event.metrics;
+        const prevMetrics = prevPoint ? prevPoint.metrics : null;
+
+        // Calculate deltas
+        const deltas = { focus: 0, stress: 0, activity: 0, engagement: 0 };
+        if (prevMetrics) {
+          Object.keys(currentMetrics).forEach((key) => {
+            deltas[key] = currentMetrics[key] - prevMetrics[key];
+          });
+        }
+
+        // Enrich the event with deltas
+        const enrichedEvent = {
+          ...event,
+          deltas
+        };
+
+        // Check safety thresholds client-side (avoid repeating alert if already out-of-bounds)
+        let clientAnomaly = null;
+
+        if (currentMetrics.stress >= 85 && (!prevMetrics || prevMetrics.stress < 85)) {
+          clientAnomaly = {
+            triggered: true,
+            type: 'STRESS_SPIKE',
+            message: 'Neural overload. Stress index exceeded safety levels (85%+).',
+            severity: 'critical',
+            timestamp: Date.now()
+          };
+        } else if (currentMetrics.focus <= 25 && (!prevMetrics || prevMetrics.focus > 25)) {
+          clientAnomaly = {
+            triggered: true,
+            type: 'FOCUS_DROP',
+            message: 'Cognitive fatigue detected. Extreme drop in attentiveness (<25%).',
+            severity: 'warning',
+            timestamp: Date.now()
+          };
+        } else if (currentMetrics.focus >= 95 && (!prevMetrics || prevMetrics.focus < 95)) {
+          clientAnomaly = {
+            triggered: true,
+            type: 'FLOW_STATE',
+            message: 'Peak Flow State. High focus and synchronized brainwave coherence (95%+).',
+            severity: 'optimal',
+            timestamp: Date.now()
+          };
+        }
+
+        // If client anomaly is detected, and there is no engine anomaly triggered on this tick:
+        if (clientAnomaly && (!enrichedEvent.anomaly || !enrichedEvent.anomaly.triggered)) {
+          enrichedEvent.anomaly = clientAnomaly;
+        }
+
+        const newHistory = [...historyRef.current, enrichedEvent];
         
         // Cap the history buffer size
         if (newHistory.length > maxBufferSize) {
@@ -37,10 +99,10 @@ export const useLiveMetrics = () => {
         setHistory(newHistory);
 
         // Check for anomalies
-        if (event.anomaly && event.anomaly.triggered) {
-          setLatestAnomaly(event.anomaly);
+        if (enrichedEvent.anomaly && enrichedEvent.anomaly.triggered) {
+          setLatestAnomaly(enrichedEvent.anomaly);
           setAnomalyEvents(prev => {
-            const newEvents = [event.anomaly, ...prev];
+            const newEvents = [enrichedEvent.anomaly, ...prev];
             return newEvents.slice(0, 50); // Cap at 50 events in log
           });
         }

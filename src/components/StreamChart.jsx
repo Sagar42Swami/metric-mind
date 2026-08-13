@@ -5,7 +5,7 @@ import {
 import { formatTime } from '../lib/utils';
 import { LineChart, ToggleLeft, ToggleRight } from 'lucide-react';
 
-export default function StreamChart({ data, activeMetric, title }) {
+export default function StreamChart({ data, activeMetric }) {
   const [showOverlay, setShowOverlay] = useState(false);
 
   // Setup color constants

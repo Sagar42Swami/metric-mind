@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AlertTriangle, X, Sparkles, BellRing } from 'lucide-react';
+import { AlertTriangle, X, Sparkles } from 'lucide-react';
 import { formatTimeFull } from '../lib/utils';
 
 export default function AlertBanner({ anomaly, onDismiss }) {

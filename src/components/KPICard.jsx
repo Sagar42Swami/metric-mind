@@ -1,11 +1,12 @@
 import React from 'react';
-import { ArrowUpRight, ArrowDownRight, Activity } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { formatPercent } from '../lib/utils';
 
 export default function KPICard({
   title,
   value,
+  delta,
   metricKey,
   avg,
   trend,
@@ -26,6 +27,7 @@ export default function KPICard({
       text: 'text-emerald-400',
       bg: 'bg-emerald-500/10',
       border: 'border-emerald-500/30',
+      activeBorder: 'border-emerald-500/80 shadow-neon-success bg-emerald-500/5',
       gradient: 'colorFocus',
       stroke: '#10b981',
       shadow: 'shadow-emerald-500/5',
@@ -35,6 +37,7 @@ export default function KPICard({
       text: 'text-rose-400',
       bg: 'bg-rose-500/10',
       border: 'border-rose-500/30',
+      activeBorder: 'border-rose-500/80 shadow-neon-danger bg-rose-500/5',
       gradient: 'colorStress',
       stroke: '#f43f5e',
       shadow: 'shadow-rose-500/5',
@@ -44,6 +47,7 @@ export default function KPICard({
       text: 'text-cyan-400',
       bg: 'bg-cyan-500/10',
       border: 'border-cyan-500/30',
+      activeBorder: 'border-cyan-500/80 shadow-neon-cyan bg-cyan-500/5',
       gradient: 'colorActivity',
       stroke: '#06b6d4',
       shadow: 'shadow-cyan-500/5',
@@ -53,6 +57,7 @@ export default function KPICard({
       text: 'text-indigo-400',
       bg: 'bg-indigo-500/10',
       border: 'border-indigo-500/30',
+      activeBorder: 'border-indigo-500/80 shadow-neon-indigo bg-indigo-500/5',
       gradient: 'colorEngagement',
       stroke: '#6366f1',
       shadow: 'shadow-indigo-500/5',
@@ -71,7 +76,7 @@ export default function KPICard({
       onClick={onClick}
       className={`glass-panel p-5 rounded-2xl cursor-pointer transition-all duration-350 select-none relative overflow-hidden group ${
         isActive 
-          ? `border-slate-400/80 shadow-md ${metricStyle.shadow} scale-[1.01]` 
+          ? `${metricStyle.activeBorder} scale-[1.01]` 
           : 'border-space-700/40 hover:border-space-600/70 hover:scale-[1.01] hover:bg-space-800/25'
       }`}
     >
@@ -93,10 +98,21 @@ export default function KPICard({
       </div>
 
       {/* Value row */}
-      <div className="flex items-baseline gap-2 mb-2 relative z-10">
+      <div className="flex items-baseline gap-2.5 mb-2 relative z-10">
         <span className={`text-3xl font-extrabold tracking-tight text-white font-mono`}>
           {value}
         </span>
+        
+        {/* Delta vs last tick */}
+        {delta !== undefined && delta !== 0 && (
+          <span className={`text-xs font-mono font-bold ${
+            delta > 0 
+              ? metricKey === 'stress' ? 'text-rose-400' : 'text-emerald-400' 
+              : metricKey === 'stress' ? 'text-emerald-400' : 'text-rose-400'
+          }`}>
+            {delta > 0 ? `+${delta}` : delta}
+          </span>
+        )}
         
         {/* Trend Indicator */}
         <div className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold ${

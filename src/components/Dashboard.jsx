@@ -64,9 +64,11 @@ export default function Dashboard() {
 
   // Current values (latest point)
   const latestPoint = history[history.length - 1] || {
-    metrics: { focus: 0, stress: 0, activity: 0, engagement: 0 }
+    metrics: { focus: 0, stress: 0, activity: 0, engagement: 0 },
+    deltas: { focus: 0, stress: 0, activity: 0, engagement: 0 }
   };
   const currentMetrics = latestPoint.metrics;
+  const currentDeltas = latestPoint.deltas || { focus: 0, stress: 0, activity: 0, engagement: 0 };
 
   // Render Skeleton HUD loader
   if (isLoading) {
@@ -149,6 +151,7 @@ export default function Dashboard() {
             title={kpi.title}
             icon={kpi.icon}
             value={kpi.value}
+            delta={currentDeltas[kpi.key]}
             avg={liveAverages[kpi.key]}
             trend={liveTrends[kpi.key]}
             data={filteredData}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Flame, ShieldAlert, Sparkles, Terminal } from 'lucide-react';
+import { Bell, ShieldAlert, Sparkles, Terminal } from 'lucide-react';
 import { formatTimeFull, getSeverityClass } from '../lib/utils';
 
 export default function EventLog({ events }) {

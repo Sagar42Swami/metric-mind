@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, Zap, Sliders, ChevronDown, Activity } from 'lucide-react';
+import { Play, Pause, RotateCcw, Zap, ChevronDown, Activity } from 'lucide-react';
 
 export default function Header({ 
   isPaused, 
@@ -38,7 +38,9 @@ export default function Header({
           </h1>
           <div className="flex items-center gap-2 mt-0.5">
             <span className={`relative flex h-2 w-2`}>
-              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${isPaused ? 'bg-amber-400' : 'bg-emerald-400'}`}></span>
+              {!isPaused && (
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-emerald-400"></span>
+              )}
               <span className={`relative inline-flex rounded-full h-2 w-2 ${isPaused ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
             </span>
             <span className="text-xs font-semibold tracking-wider text-slate-400 uppercase">
