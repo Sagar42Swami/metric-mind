@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { dataEngine } from '../lib/dataEngine';
+import { playTelemetrySound } from '../lib/utils';
 
 export const useLiveMetrics = () => {
   const [history, setHistory] = useState([]);
@@ -8,12 +9,26 @@ export const useLiveMetrics = () => {
   const [anomalyEvents, setAnomalyEvents] = useState([]);
   const [latestAnomaly, setLatestAnomaly] = useState(null);
 
+  // Custom Settings & Alerts state
+  const [thresholds, setThresholds] = useState({
+    stressMax: 85,
+    focusMin: 25,
+    focusOptimal: 95
+  });
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
   // Maximum number of points to keep in memory (approx 5-6 mins of history at 1.5s)
   const maxBufferSize = 250;
 
   // Use refs to access latest values in the callback without re-subscribing
   const historyRef = useRef([]);
   historyRef.current = history;
+
+  const thresholdsRef = useRef(thresholds);
+  thresholdsRef.current = thresholds;
+
+  const soundEnabledRef = useRef(soundEnabled);
+  soundEnabledRef.current = soundEnabled;
 
   // Initialize and subscribe
   useEffect(() => {
@@ -58,28 +73,29 @@ export const useLiveMetrics = () => {
 
         // Check safety thresholds client-side (avoid repeating alert if already out-of-bounds)
         let clientAnomaly = null;
+        const limits = thresholdsRef.current;
 
-        if (currentMetrics.stress >= 85 && (!prevMetrics || prevMetrics.stress < 85)) {
+        if (currentMetrics.stress >= limits.stressMax && (!prevMetrics || prevMetrics.stress < limits.stressMax)) {
           clientAnomaly = {
             triggered: true,
             type: 'STRESS_SPIKE',
-            message: 'Neural overload. Stress index exceeded safety levels (85%+).',
+            message: `Neural overload. Stress index exceeded safety levels (${limits.stressMax}%+).`,
             severity: 'critical',
             timestamp: Date.now()
           };
-        } else if (currentMetrics.focus <= 25 && (!prevMetrics || prevMetrics.focus > 25)) {
+        } else if (currentMetrics.focus <= limits.focusMin && (!prevMetrics || prevMetrics.focus > limits.focusMin)) {
           clientAnomaly = {
             triggered: true,
             type: 'FOCUS_DROP',
-            message: 'Cognitive fatigue detected. Extreme drop in attentiveness (<25%).',
+            message: `Cognitive fatigue detected. Extreme drop in attentiveness (<${limits.focusMin}%).`,
             severity: 'warning',
             timestamp: Date.now()
           };
-        } else if (currentMetrics.focus >= 95 && (!prevMetrics || prevMetrics.focus < 95)) {
+        } else if (currentMetrics.focus >= limits.focusOptimal && (!prevMetrics || prevMetrics.focus < limits.focusOptimal)) {
           clientAnomaly = {
             triggered: true,
             type: 'FLOW_STATE',
-            message: 'Peak Flow State. High focus and synchronized brainwave coherence (95%+).',
+            message: `Peak Flow State. High focus and brainwave coherence (${limits.focusOptimal}%+).`,
             severity: 'optimal',
             timestamp: Date.now()
           };
@@ -105,6 +121,9 @@ export const useLiveMetrics = () => {
             const newEvents = [enrichedEvent.anomaly, ...prev];
             return newEvents.slice(0, 50); // Cap at 50 events in log
           });
+          if (soundEnabledRef.current) {
+            playTelemetrySound(enrichedEvent.anomaly.severity);
+          }
         }
       } else if (event.type === 'STATUS_UPDATE') {
         setIsPaused(event.isPaused);
@@ -170,6 +189,10 @@ export const useLiveMetrics = () => {
     tickRate,
     anomalyEvents,
     latestAnomaly,
+    thresholds,
+    setThresholds,
+    soundEnabled,
+    setSoundEnabled,
     pause,
     resume,
     setSpeed,
