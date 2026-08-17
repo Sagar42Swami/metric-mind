@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, Zap, ChevronDown, Activity } from 'lucide-react';
+import { Play, Pause, RotateCcw, Zap, ChevronDown, Activity, Settings, BarChart2 } from 'lucide-react';
 
 export default function Header({ 
   isPaused, 
@@ -8,7 +8,11 @@ export default function Header({
   onResume, 
   onSetSpeed, 
   onTriggerAnomaly, 
-  onReset 
+  onReset,
+  showSettings,
+  onToggleSettings,
+  showSummary,
+  onToggleSummary
 }) {
   const [showAnomalyMenu, setShowAnomalyMenu] = useState(false);
 
@@ -124,6 +128,32 @@ export default function Header({
             </div>
           )}
         </div>
+
+        {/* Session Analytics Summary */}
+        <button
+          onClick={onToggleSummary}
+          title="Session Analytics Summary"
+          className={`p-2.5 rounded-xl border transition-all duration-200 ${
+            showSummary 
+              ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50 shadow-neon-cyan/20' 
+              : 'bg-slate-800/40 hover:bg-slate-800/80 text-slate-400 hover:text-slate-200 border border-space-700/30 hover:border-space-600'
+          }`}
+        >
+          <BarChart2 className="h-4 w-4" />
+        </button>
+
+        {/* Dynamic Settings */}
+        <button
+          onClick={onToggleSettings}
+          title="Telemetry Settings"
+          className={`p-2.5 rounded-xl border transition-all duration-200 ${
+            showSettings 
+              ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/50 shadow-neon-indigo/20' 
+              : 'bg-slate-800/40 hover:bg-slate-800/80 text-slate-400 hover:text-slate-200 border border-space-700/30 hover:border-space-600'
+          }`}
+        >
+          <Settings className="h-4 w-4" />
+        </button>
 
         {/* Reset */}
         <button
