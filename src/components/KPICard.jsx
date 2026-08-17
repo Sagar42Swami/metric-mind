@@ -13,7 +13,8 @@ export default function KPICard({
   icon: Icon,
   data,
   isActive,
-  onClick
+  onClick,
+  thresholds
 }) {
   // Format the sparkline data
   const sparklineData = data.slice(-15).map((pt, idx) => ({
@@ -67,6 +68,16 @@ export default function KPICard({
 
   const metricStyle = styles[metricKey] || styles.focus;
   const isTrendPositive = trend >= 0;
+
+  // Get threshold limit text if applicable
+  let limitLabel = '';
+  if (thresholds) {
+    if (metricKey === 'focus') {
+      limitLabel = `<${thresholds.focusMin}% | >=${thresholds.focusOptimal}%`;
+    } else if (metricKey === 'stress') {
+      limitLabel = `>=${thresholds.stressMax}%`;
+    }
+  }
 
   // For Stress, lower is better (positive change could actually mean stress is increasing, so let's adjust badge color contextually)
   const isTrendGood = metricKey === 'stress' ? !isTrendPositive : isTrendPositive;
@@ -135,6 +146,14 @@ export default function KPICard({
           <div className="font-semibold uppercase tracking-wider">Avg Value</div>
           <div className="text-slate-300 font-mono font-bold text-sm mt-0.5">{avg}</div>
         </div>
+
+        {/* Limit Indicator */}
+        {limitLabel && (
+          <div className="text-[10px] text-slate-500 leading-tight">
+            <div className="font-semibold uppercase tracking-wider">Safety Limits</div>
+            <div className="text-slate-400 font-mono font-bold text-[9px] mt-1 shrink-0">{limitLabel}</div>
+          </div>
+        )}
 
         {/* Mini Sparkline Chart */}
         <div className="w-28 h-full opacity-60 group-hover:opacity-90 transition-opacity duration-300">
