@@ -88,7 +88,7 @@ export default function KPICard({
       className={`glass-panel p-5 rounded-2xl cursor-pointer transition-all duration-350 select-none relative overflow-hidden group ${
         isActive 
           ? `${metricStyle.activeBorder} scale-[1.01]` 
-          : 'border-space-700/40 hover:border-space-600/70 hover:scale-[1.01] hover:bg-space-800/25'
+          : 'border-opacity-50 hover:border-opacity-80 hover:scale-[1.01] hover:bg-slate-900/10'
       }`}
     >
       {/* Decorative backing glow */}
