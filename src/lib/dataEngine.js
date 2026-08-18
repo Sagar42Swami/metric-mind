@@ -17,6 +17,7 @@ class MockDataStreamEngine {
     };
     
     this.time = 0;
+    this.currentProfile = 'DEFAULT'; // 'DEFAULT', 'DEEP_FOCUS', 'HIGH_STRESS', 'RECOVERY'
   }
 
   // Register a subscriber callback
@@ -64,6 +65,11 @@ class MockDataStreamEngine {
     }
   }
 
+  // Adjust baseline profiles dynamically
+  setProfile(profile) {
+    this.currentProfile = profile;
+  }
+
   // Trigger subscriber notifications about status (running/paused)
   notifyStatusChange() {
     const statusUpdate = {
@@ -86,24 +92,51 @@ class MockDataStreamEngine {
       anomalyData = this.generateAnomaly();
     } else {
       // Normal tick: apply smooth random walk + waves
-      
-      // Focus: baseline ~70, sine wave variation, random walk of -3 to +3
+      let baselineFocus = 70;
+      let baselineStress = 40;
+      let baselineActivity = 55;
+      let baselineEngagement = 75;
+
+      if (this.currentProfile === 'DEEP_FOCUS') {
+        baselineFocus = 88;
+        baselineStress = 20;
+        baselineActivity = 45;
+        baselineEngagement = 92;
+      } else if (this.currentProfile === 'HIGH_STRESS') {
+        baselineFocus = 42;
+        baselineStress = 82;
+        baselineActivity = 78;
+        baselineEngagement = 60;
+      } else if (this.currentProfile === 'RECOVERY') {
+        baselineFocus = 60;
+        baselineStress = 15;
+        baselineActivity = 25;
+        baselineEngagement = 50;
+      }
+
+      // Now calculate metrics using these profile baseline adjustments
       const focusWave = Math.sin(this.time * 0.5) * 5;
       const focusWalk = (Math.random() - 0.5) * 4;
-      this.currentValues.focus = Math.max(10, Math.min(100, this.currentValues.focus + focusWalk + (focusWave * 0.1)));
+      // Walk towards the target (weighted average) to create a smooth transition between presets
+      const targetFocus = baselineFocus + focusWave + focusWalk;
+      this.currentValues.focus = this.currentValues.focus * 0.85 + targetFocus * 0.15;
+      this.currentValues.focus = Math.max(10, Math.min(100, this.currentValues.focus));
 
-      // Stress: baseline ~40, random walk of -4 to +4, inverse relationship with focus trend
+      // Stress walk towards baseline, with inverse relationship to focus
       const stressInverse = (70 - this.currentValues.focus) * 0.15;
-      const stressWalk = (Math.random() - 0.5) * 5 + stressInverse;
-      this.currentValues.stress = Math.max(5, Math.min(100, this.currentValues.stress + stressWalk));
+      const targetStress = baselineStress + (Math.random() - 0.5) * 5 + stressInverse;
+      this.currentValues.stress = this.currentValues.stress * 0.85 + targetStress * 0.15;
+      this.currentValues.stress = Math.max(5, Math.min(100, this.currentValues.stress));
 
-      // Activity: baseline ~55, high frequency variation
-      const activityWalk = (Math.random() - 0.5) * 8;
-      this.currentValues.activity = Math.max(10, Math.min(100, this.currentValues.activity + activityWalk));
+      // Activity
+      const targetActivity = baselineActivity + (Math.random() - 0.5) * 8;
+      this.currentValues.activity = this.currentValues.activity * 0.85 + targetActivity * 0.15;
+      this.currentValues.activity = Math.max(10, Math.min(100, this.currentValues.activity));
 
-      // Engagement: baseline ~75, smooth slow walk
-      const engagementWalk = (Math.random() - 0.5) * 3;
-      this.currentValues.engagement = Math.max(20, Math.min(100, this.currentValues.engagement + engagementWalk));
+      // Engagement
+      const targetEngagement = baselineEngagement + (Math.random() - 0.5) * 3;
+      this.currentValues.engagement = this.currentValues.engagement * 0.85 + targetEngagement * 0.15;
+      this.currentValues.engagement = Math.max(20, Math.min(100, this.currentValues.engagement));
     }
 
     // Round values for UI cleanliness
