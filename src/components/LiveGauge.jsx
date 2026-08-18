@@ -102,7 +102,7 @@ export default function LiveGauge({ value, title, metricKey, avg }) {
               isAnimationActive={false} // Keeps update responsive
             >
               <Cell fill={`url(#${currentTheme.gradientId})`} />
-              <Cell fill="#1e293b" opacity={0.3} />
+              <Cell fill="var(--color-hud-border)" opacity={0.25} />
             </Pie>
           </PieChart>
         </ResponsiveContainer>
