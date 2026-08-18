@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, Zap, ChevronDown, Activity, Settings, BarChart2 } from 'lucide-react';
+import { Play, Pause, RotateCcw, Zap, ChevronDown, Activity, Settings, BarChart2, Wind } from 'lucide-react';
 
 export default function Header({ 
   isPaused, 
@@ -12,7 +12,9 @@ export default function Header({
   showSettings,
   onToggleSettings,
   showSummary,
-  onToggleSummary
+  onToggleSummary,
+  showBreathing,
+  onToggleBreathing
 }) {
   const [showAnomalyMenu, setShowAnomalyMenu] = useState(false);
 
@@ -128,6 +130,19 @@ export default function Header({
             </div>
           )}
         </div>
+
+        {/* Breathing Trainer Toggle */}
+        <button
+          onClick={onToggleBreathing}
+          title="Flow Coherence Breathing Trainer"
+          className={`p-2.5 rounded-xl border transition-all duration-200 ${
+            showBreathing 
+              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-neon-success/20' 
+              : 'bg-slate-800/40 hover:bg-slate-800/80 text-slate-400 hover:text-slate-200 border border-space-700/30 hover:border-space-600'
+          }`}
+        >
+          <Wind className="h-4 w-4" />
+        </button>
 
         {/* Session Analytics Summary */}
         <button
