@@ -6,7 +6,8 @@
 
 @layer base {
   body {
-    @apply bg-[#060913] text-slate-200 font-sans min-h-screen overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-200;
+    background-color: var(--color-hud-bg, #060913);
+    @apply text-slate-200 font-sans min-h-screen overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-200;
   }
 }
 
@@ -31,11 +32,12 @@
 
 /* Custom glassmorphic panel classes */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.45);
+  background: var(--color-hud-panel, rgba(15, 23, 42, 0.45));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--color-hud-border, rgba(30, 41, 59, 0.5));
   box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.03), 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 .glass-panel-hover {
@@ -70,23 +72,53 @@
 .grid-bg {
   background-size: 40px 40px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line-color, rgba(255, 255, 255, 0.015)) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line-color, rgba(255, 255, 255, 0.015)) 1px, transparent 1px);
+  transition: background-image 0.4s ease;
 }
 
 .radial-glow {
-  background: radial-gradient(circle 800px at 50% -200px, rgba(99, 102, 241, 0.15), transparent 80%);
+  background: radial-gradient(circle 800px at 50% -200px, var(--color-hud-glow, rgba(99, 102, 241, 0.15)), transparent 80%);
+  transition: background 0.4s ease;
 }
 
-/* Animation utilities */
-.animate-delay-100 {
-  animation-delay: 100ms;
+/* Theme variables declarations */
+:root {
+  --color-hud-bg: #060913;
+  --color-hud-panel: rgba(15, 23, 42, 0.45);
+  --color-hud-border: rgba(30, 41, 59, 0.5);
+  --color-hud-glow: rgba(99, 102, 241, 0.15);
+  --grid-line-color: rgba(255, 255, 255, 0.015);
 }
-.animate-delay-200 {
-  animation-delay: 200ms;
+
+body.theme-cyberpunk {
+  --color-hud-bg: #0b0114;
+  --color-hud-panel: rgba(24, 2, 42, 0.55);
+  --color-hud-border: rgba(236, 72, 153, 0.45);
+  --color-hud-glow: rgba(236, 72, 153, 0.18);
+  --grid-line-color: rgba(236, 72, 153, 0.018);
 }
-.animate-delay-300 {
-  animation-delay: 300ms;
+
+body.theme-matrix {
+  --color-hud-bg: #000000;
+  --color-hud-panel: rgba(2, 12, 2, 0.7);
+  --color-hud-border: rgba(34, 197, 94, 0.4);
+  --color-hud-glow: rgba(34, 197, 94, 0.18);
+  --grid-line-color: rgba(34, 197, 94, 0.02);
+}
+
+body {
+  transition: background-color 0.4s ease, color 0.3s ease;
+}
+
+/* Breathing animation helper */
+@keyframes breathingBubble {
+  0%, 100% { transform: scale(0.85); box-shadow: 0 0 15px var(--color-hud-border); }
+  50% { transform: scale(1.15); box-shadow: 0 0 35px var(--color-hud-border); }
+}
+
+.animate-breathing-bubble {
+  animation: breathingBubble 4s ease-in-out infinite;
 }
 
 /* Recharts transition optimization */
