@@ -158,6 +158,18 @@ export const useLiveMetrics = () => {
     dataEngine.triggerManualAnomaly(type);
   }, []);
 
+  const setProfile = useCallback((profile) => {
+    dataEngine.setProfile(profile);
+  }, []);
+
+  const injectMetricShift = useCallback((focusDelta, stressDelta) => {
+    dataEngine.currentValues.focus = Math.max(10, Math.min(100, dataEngine.currentValues.focus + focusDelta));
+    dataEngine.currentValues.stress = Math.max(5, Math.min(100, dataEngine.currentValues.stress + stressDelta));
+    if (!dataEngine.isPaused) {
+      dataEngine.tick();
+    }
+  }, []);
+
   const dismissAnomaly = useCallback(() => {
     setLatestAnomaly(null);
   }, []);
@@ -198,6 +210,8 @@ export const useLiveMetrics = () => {
     setSpeed,
     triggerAnomaly,
     dismissAnomaly,
-    reset
+    reset,
+    setProfile,
+    injectMetricShift
   };
 };
