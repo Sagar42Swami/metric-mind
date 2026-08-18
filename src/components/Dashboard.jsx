@@ -9,6 +9,7 @@ import StreamChart from './StreamChart';
 import CategoryBarChart from './CategoryBarChart';
 import DistributionPieChart from './DistributionPieChart';
 import EventLog from './EventLog';
+import BreathingTrainer from './BreathingTrainer';
 
 import { Brain, Flame, Activity, Target, Volume2, VolumeX, Download, X, Info, SlidersHorizontal } from 'lucide-react';
 import { calcAverage, calcTrend } from '../lib/utils';
@@ -31,7 +32,9 @@ export default function Dashboard() {
     setSpeed,
     triggerAnomaly,
     dismissAnomaly,
-    reset
+    reset,
+    setProfile,
+    injectMetricShift
   } = useLiveMetrics();
 
   // Selected filters
@@ -42,6 +45,7 @@ export default function Dashboard() {
   // UI Panels states
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [showBreathingPanel, setShowBreathingPanel] = useState(false);
 
   const handleExportSessionLogs = () => {
     try {
@@ -152,6 +156,8 @@ export default function Dashboard() {
         onToggleSettings={() => setShowSettingsPanel(!showSettingsPanel)}
         showSummary={showSummaryModal}
         onToggleSummary={() => setShowSummaryModal(!showSummaryModal)}
+        showBreathing={showBreathingPanel}
+        onToggleBreathing={() => setShowBreathingPanel(!showBreathingPanel)}
       />
 
       {/* 2. Alert banner if anomaly occurs */}
@@ -159,6 +165,14 @@ export default function Dashboard() {
         anomaly={latestAnomaly}
         onDismiss={dismissAnomaly}
       />
+
+      {/* Breathing Trainer Panel */}
+      {showBreathingPanel && (
+        <BreathingTrainer
+          onCoherenceCycle={injectMetricShift}
+          onClose={() => setShowBreathingPanel(false)}
+        />
+      )}
 
       {/* 3. Filter control bar */}
       <FilterBar
@@ -184,7 +198,7 @@ export default function Dashboard() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Stress Threshold Slider */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -234,6 +248,24 @@ export default function Dashboard() {
                 className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
               />
               <p className="text-[10px] text-slate-500 italic">Triggers peak coherence state alert when focus exceeds this value.</p>
+            </div>
+
+            {/* Simulation Profile Presets */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
+                <span>Simulation Profile</span>
+                <span className="text-indigo-400 font-mono">ACTIVE</span>
+              </div>
+              <select
+                onChange={(e) => setProfile(e.target.value)}
+                className="w-full bg-slate-900 border border-space-700/50 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-300 outline-none cursor-pointer focus:border-indigo-500/50"
+              >
+                <option value="DEFAULT" className="bg-[#0f172a] text-slate-300 font-bold">Balanced Default</option>
+                <option value="DEEP_FOCUS" className="bg-[#0f172a] text-emerald-400 font-bold">Deep Focus Mode</option>
+                <option value="HIGH_STRESS" className="bg-[#0f172a] text-rose-400 font-bold">High Stress Overload</option>
+                <option value="RECOVERY" className="bg-[#0f172a] text-cyan-400 font-bold">Calm Recovery State</option>
+              </select>
+              <p className="text-[10px] text-slate-500 italic">Sets the core baseline data simulator profiles dynamically.</p>
             </div>
           </div>
 
