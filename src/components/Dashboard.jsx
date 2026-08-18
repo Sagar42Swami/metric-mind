@@ -46,6 +46,13 @@ export default function Dashboard() {
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [showBreathingPanel, setShowBreathingPanel] = useState(false);
+  const [activeTheme, setActiveTheme] = useState('default'); // 'default', 'cyberpunk', 'matrix'
+
+  // Apply theme classes to body
+  useEffect(() => {
+    document.body.classList.remove('theme-default', 'theme-cyberpunk', 'theme-matrix');
+    document.body.classList.add(`theme-${activeTheme}`);
+  }, [activeTheme]);
 
   const handleExportSessionLogs = () => {
     try {
@@ -269,9 +276,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-t border-space-700/40 pt-4 mt-2">
-            {/* Audio Alert switch */}
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-t border-space-700/40 pt-4 mt-2">
+            {/* Audio Alert switch & Themes */}
+            <div className="flex flex-wrap items-center gap-4">
               <button
                 onClick={() => setSoundEnabled(!soundEnabled)}
                 className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-200 ${
@@ -281,9 +288,43 @@ export default function Dashboard() {
                 }`}
               >
                 {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-                <span>{soundEnabled ? 'Synthesized Telemetry Sound Enabled' : 'Sound Muted'}</span>
+                <span>{soundEnabled ? 'Telemetry Sound Enabled' : 'Sound Muted'}</span>
               </button>
-              <span className="text-[10px] text-slate-500 font-medium">Audio context plays beeps dynamically on boundary alerts.</span>
+
+              {/* Aesthetic Theme Selector */}
+              <div className="flex items-center gap-2 bg-slate-900 border border-space-700/50 p-1.5 rounded-xl">
+                <span className="text-[10px] font-bold text-slate-500 uppercase px-1.5">Theme:</span>
+                <button
+                  onClick={() => setActiveTheme('default')}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all duration-200 ${
+                    activeTheme === 'default' 
+                      ? 'bg-indigo-500 text-white shadow-neon-indigo/20' 
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Space
+                </button>
+                <button
+                  onClick={() => setActiveTheme('cyberpunk')}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all duration-200 ${
+                    activeTheme === 'cyberpunk' 
+                      ? 'bg-pink-500 text-white shadow-neon-danger/20' 
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Neon
+                </button>
+                <button
+                  onClick={() => setActiveTheme('matrix')}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all duration-200 ${
+                    activeTheme === 'matrix' 
+                      ? 'bg-emerald-500 text-[#02040a] shadow-neon-success/20' 
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Matrix
+                </button>
+              </div>
             </div>
 
             {/* Export Session Logs button */}
