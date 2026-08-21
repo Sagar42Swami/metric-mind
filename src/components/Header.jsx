@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, Zap, ChevronDown, Activity, Settings, BarChart2, Wind } from 'lucide-react';
+import { Play, Pause, RotateCcw, Zap, ChevronDown, Activity, Settings, BarChart2, Wind, ShieldAlert } from 'lucide-react';
 
 export default function Header({ 
   isPaused, 
@@ -14,7 +14,9 @@ export default function Header({
   showSummary,
   onToggleSummary,
   showBreathing,
-  onToggleBreathing
+  onToggleBreathing,
+  showBreaks,
+  onToggleBreaks
 }) {
   const [showAnomalyMenu, setShowAnomalyMenu] = useState(false);
 
@@ -142,6 +144,19 @@ export default function Header({
           }`}
         >
           <Wind className="h-4 w-4" />
+        </button>
+
+        {/* Micro-Break Stretch Toggle */}
+        <button
+          onClick={onToggleBreaks}
+          title="Micro-Break Stretches"
+          className={`p-2.5 rounded-xl border transition-all duration-200 ${
+            showBreaks 
+              ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/50 shadow-neon-indigo/20' 
+              : 'bg-slate-800/40 hover:bg-slate-800/80 text-slate-400 hover:text-slate-200 border border-space-700/30 hover:border-space-600'
+          }`}
+        >
+          <ShieldAlert className="h-4 w-4" />
         </button>
 
         {/* Session Analytics Summary */}

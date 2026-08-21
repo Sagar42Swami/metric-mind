@@ -174,6 +174,8 @@ export default function Dashboard() {
         onToggleSummary={() => setShowSummaryModal(!showSummaryModal)}
         showBreathing={showBreathingPanel}
         onToggleBreathing={() => setShowBreathingPanel(!showBreathingPanel)}
+        showBreaks={showBreaksModal}
+        onToggleBreaks={() => setShowBreaksModal(!showBreaksModal)}
       />
 
       {/* 2. Alert banner if anomaly occurs */}
