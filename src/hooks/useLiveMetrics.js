@@ -21,6 +21,7 @@ export const useLiveMetrics = () => {
     { timestamp: Date.now() - 240000, title: 'Standup Sync' },
     { timestamp: Date.now() - 90000, title: 'Code Review' }
   ]);
+  const [dailyGoal, setDailyGoal] = useState({ flowMinutes: 1.8, targetMinutes: 5.0, streak: 0 });
 
   // Maximum number of points to keep in memory (approx 5-6 mins of history at 1.5s)
   const maxBufferSize = 250;
@@ -34,6 +35,9 @@ export const useLiveMetrics = () => {
 
   const soundEnabledRef = useRef(soundEnabled);
   soundEnabledRef.current = soundEnabled;
+
+  const tickRateRef = useRef(tickRate);
+  tickRateRef.current = tickRate;
 
   // Initialize and subscribe
   useEffect(() => {
@@ -118,6 +122,23 @@ export const useLiveMetrics = () => {
           newHistory.shift();
         }
         setHistory(newHistory);
+
+        // Update flow training statistics
+        if (currentMetrics.focus >= limits.focusOptimal) {
+          setDailyGoal(prev => {
+            const increment = (tickRateRef.current || 1500) / 60000;
+            return {
+              ...prev,
+              flowMinutes: Number((prev.flowMinutes + increment).toFixed(2)),
+              streak: prev.streak + 1
+            };
+          });
+        } else {
+          setDailyGoal(prev => ({
+            ...prev,
+            streak: 0
+          }));
+        }
 
         // Check for anomalies
         if (enrichedEvent.anomaly && enrichedEvent.anomaly.triggered) {
@@ -238,6 +259,7 @@ export const useLiveMetrics = () => {
     injectMetricShift,
     annotations,
     addAnnotation,
-    calendarEvents
+    calendarEvents,
+    dailyGoal
   };
 };
