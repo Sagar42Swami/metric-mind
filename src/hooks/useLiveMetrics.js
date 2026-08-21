@@ -17,6 +17,10 @@ export const useLiveMetrics = () => {
   });
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [annotations, setAnnotations] = useState([]);
+  const [calendarEvents, setCalendarEvents] = useState([
+    { timestamp: Date.now() - 240000, title: 'Standup Sync' },
+    { timestamp: Date.now() - 90000, title: 'Code Review' }
+  ]);
 
   // Maximum number of points to keep in memory (approx 5-6 mins of history at 1.5s)
   const maxBufferSize = 250;
@@ -233,6 +237,7 @@ export const useLiveMetrics = () => {
     setProfile,
     injectMetricShift,
     annotations,
-    addAnnotation
+    addAnnotation,
+    calendarEvents
   };
 };
