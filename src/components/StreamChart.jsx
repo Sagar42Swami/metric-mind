@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { 
-  AreaChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+  AreaChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import { formatTime } from '../lib/utils';
 import { LineChart, ToggleLeft, ToggleRight } from 'lucide-react';
 
-export default function StreamChart({ data, activeMetric }) {
+export default function StreamChart({ data, activeMetric, annotations = [], calendarEvents = [] }) {
   const [showOverlay, setShowOverlay] = useState(false);
 
   // Setup color constants
@@ -54,6 +54,12 @@ export default function StreamChart({ data, activeMetric }) {
     stress: pt.metrics?.stress ?? 0,
     activity: pt.metrics?.activity ?? 0,
     engagement: pt.metrics?.engagement ?? 0,
+  }));
+
+  // Format annotation timestamps to match the categorical X-axis formatting
+  const chartAnnotations = annotations.map(ann => ({
+    ...ann,
+    formattedTime: formatTime(ann.timestamp)
   }));
 
   return (
@@ -184,6 +190,18 @@ export default function StreamChart({ data, activeMetric }) {
                 isAnimationActive={false}
               />
             )}
+
+            {/* Render logged timeline annotations */}
+            {chartAnnotations.map((ann, idx) => (
+              <ReferenceLine
+                key={`ann-${idx}`}
+                x={ann.formattedTime}
+                stroke="var(--color-hud-border)"
+                strokeWidth={1}
+                strokeDasharray="2 3"
+                label={{ value: '📝', position: 'top', fill: '#a5b4fc', fontSize: 10 }}
+              />
+            ))}
 
             {/* Active glowing area */}
             <Area
