@@ -62,6 +62,11 @@ export default function StreamChart({ data, activeMetric, annotations = [], cale
     formattedTime: formatTime(ann.timestamp)
   }));
 
+  const chartEvents = calendarEvents.map(evt => ({
+    ...evt,
+    formattedTime: formatTime(evt.timestamp)
+  }));
+
   return (
     <div className="glass-panel p-6 rounded-2xl border border-space-700/40 w-full relative z-25 group">
       
@@ -200,6 +205,18 @@ export default function StreamChart({ data, activeMetric, annotations = [], cale
                 strokeWidth={1}
                 strokeDasharray="2 3"
                 label={{ value: '📝', position: 'top', fill: '#a5b4fc', fontSize: 10 }}
+              />
+            ))}
+
+            {/* Render mock calendar events */}
+            {chartEvents.map((evt, idx) => (
+              <ReferenceLine
+                key={`evt-${idx}`}
+                x={evt.formattedTime}
+                stroke="var(--color-hud-border)"
+                strokeWidth={1}
+                strokeDasharray="1 3"
+                label={{ value: `📅 ${evt.title}`, position: 'insideTopLeft', fill: '#94a3b8', fontSize: 8 }}
               />
             ))}
 
