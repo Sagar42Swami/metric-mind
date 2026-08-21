@@ -67,6 +67,30 @@ Toggle dynamic UI themes inside the settings dashboard:
 - **Neon Cyberpunk**: Pink neon borders, violet shadows, yellow highlights.
 - **Matrix Digital**: Black terminal console with phosphor green layouts.
 
+## 📖 Interactive User Walkthrough
+
+This console provides interactive cognitive exercises and live interface modifiers. Here is how to use them during a session:
+
+1. **Modify the Simulation Presets**:
+   - Open the settings drawer (gear icon in the top right).
+   - Locate the **Simulation Profile** dropdown.
+   - Select **Deep Focus Mode** to watch focus levels rise and stress indicators fall, or select **High Stress Overload** to trigger safety limits breaches.
+2. **Interact with the Bio-Feedback Breathing Trainer**:
+   - Click the wind icon in the header navigation.
+   - Follow the expanding/contracting circle guide (4s Inhale, 4s Hold, 4s Exhale).
+   - Once you complete a breathing cycle (the "Hold" phase), notice the Focus score increases by `+3` and Stress decreases by `-5` instantly.
+3. **Toggle Ambient Soundscapes**:
+   - Find the **Ambient Soundscapes** card on the dashboard.
+   - Select **Binaural Beats** or **Pink Noise** to activate browser-synthesized audio.
+   - Change preset profiles or trigger anomalies to hear the audio frequency/filters adjust automatically to your Focus score.
+4. **Log Context Timeline Notes**:
+   - Locate the **Timeline Annotations** card.
+   - Type a note (e.g. "writing documentation") and click the `+` button.
+   - Look at the streaming line chart: a vertical dashed line with a 📝 icon will appear exactly at that time indicator.
+5. **Calibrate Micro-Break Stretches**:
+   - If stress indicators exceed safety limits for more than 5 ticks, or if you click the Shield alert button in the header, the **Micro-Break stretches modal** overlay appears.
+   - Follow the steps to relax your neck, roll your shoulders, look away from the screen, and stretch your wrists.
+
 ---
 
 ## 🛠️ Tech Stack
