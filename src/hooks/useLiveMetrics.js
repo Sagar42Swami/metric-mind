@@ -16,6 +16,7 @@ export const useLiveMetrics = () => {
     focusOptimal: 95
   });
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [annotations, setAnnotations] = useState([]);
 
   // Maximum number of points to keep in memory (approx 5-6 mins of history at 1.5s)
   const maxBufferSize = 250;
@@ -174,6 +175,24 @@ export const useLiveMetrics = () => {
     setLatestAnomaly(null);
   }, []);
 
+  const addAnnotation = useCallback((text) => {
+    const newNote = {
+      timestamp: Date.now(),
+      text
+    };
+    setAnnotations(prev => [...prev, newNote]);
+    setAnomalyEvents(prev => {
+      const newEvent = {
+        triggered: true,
+        type: 'USER_NOTE',
+        message: `Note: "${text}"`,
+        severity: 'info',
+        timestamp: Date.now()
+      };
+      return [newEvent, ...prev].slice(0, 50);
+    });
+  }, []);
+
   const reset = useCallback(() => {
     dataEngine.pause();
     setHistory([]);
@@ -212,6 +231,8 @@ export const useLiveMetrics = () => {
     dismissAnomaly,
     reset,
     setProfile,
-    injectMetricShift
+    injectMetricShift,
+    annotations,
+    addAnnotation
   };
 };
