@@ -10,6 +10,8 @@ import CategoryBarChart from './CategoryBarChart';
 import DistributionPieChart from './DistributionPieChart';
 import EventLog from './EventLog';
 import BreathingTrainer from './BreathingTrainer';
+import AmbientAudio from './AmbientAudio';
+import Annotations from './Annotations';
 
 import { Brain, Flame, Activity, Target, Volume2, VolumeX, Download, X, Info, SlidersHorizontal } from 'lucide-react';
 import { calcAverage, calcTrend } from '../lib/utils';
@@ -366,6 +368,8 @@ export default function Dashboard() {
             data={filteredData}
             activeMetric={activeMetric}
             title={kpis.find(k => k.key === activeMetric)?.title || 'Telemetry Data'}
+            annotations={annotations}
+            calendarEvents={calendarEvents}
           />
         </div>
         <div className="flex">
@@ -375,6 +379,16 @@ export default function Dashboard() {
             metricKey={activeMetric}
             avg={liveAverages[activeMetric]}
           />
+        </div>
+      </div>
+
+      {/* Dynamic Focus Tools (Soundscapes, Notes, Goals) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <AmbientAudio focusVal={currentMetrics.focus} />
+        <Annotations annotations={annotations} onAddAnnotation={addAnnotation} />
+        {/* DailyGoals will be rendered in the next commit */}
+        <div className="glass-panel p-5 rounded-2xl border border-indigo-500/5 bg-slate-900/10 flex items-center justify-center text-slate-500 text-xs italic">
+          Target goals panel pending installation...
         </div>
       </div>
 
