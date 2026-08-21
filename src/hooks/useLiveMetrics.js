@@ -17,7 +17,7 @@ export const useLiveMetrics = () => {
   });
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [annotations, setAnnotations] = useState([]);
-  const [calendarEvents, setCalendarEvents] = useState([
+  const [calendarEvents] = useState([
     { timestamp: Date.now() - 240000, title: 'Standup Sync' },
     { timestamp: Date.now() - 90000, title: 'Code Review' }
   ]);

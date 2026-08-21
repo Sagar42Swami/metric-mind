@@ -236,7 +236,7 @@ export const updateAmbientFrequency = (focusVal) => {
       const beatOffset = focusVal >= 85 ? 10 : focusVal >= 60 ? 6 : 4;
       binauralOscRight.frequency.exponentialRampToValueAtTime(150 + beatOffset, ambientCtx.currentTime + 0.5);
     }
-  } catch (e) {}
+  } catch {}
 };
 
 // Stop audio scapes
@@ -255,5 +255,5 @@ export const stopAmbientSound = () => {
       binauralOscRight = null;
     }
     filterNode = null;
-  } catch (e) {}
+  } catch {}
 };
