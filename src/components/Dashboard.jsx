@@ -12,6 +12,8 @@ import EventLog from './EventLog';
 import BreathingTrainer from './BreathingTrainer';
 import AmbientAudio from './AmbientAudio';
 import Annotations from './Annotations';
+import DailyGoals from './DailyGoals';
+import BreaksPanel from './BreaksPanel';
 
 import { Brain, Flame, Activity, Target, Volume2, VolumeX, Download, X, Info, SlidersHorizontal } from 'lucide-react';
 import { calcAverage, calcTrend } from '../lib/utils';
@@ -36,7 +38,11 @@ export default function Dashboard() {
     dismissAnomaly,
     reset,
     setProfile,
-    injectMetricShift
+    injectMetricShift,
+    annotations,
+    addAnnotation,
+    calendarEvents,
+    dailyGoal
   } = useLiveMetrics();
 
   // Selected filters
@@ -49,6 +55,7 @@ export default function Dashboard() {
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [showBreathingPanel, setShowBreathingPanel] = useState(false);
   const [activeTheme, setActiveTheme] = useState('default'); // 'default', 'cyberpunk', 'matrix'
+  const [showBreaksModal, setShowBreaksModal] = useState(false);
 
   // Apply theme classes to body
   useEffect(() => {
@@ -386,10 +393,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         <AmbientAudio focusVal={currentMetrics.focus} />
         <Annotations annotations={annotations} onAddAnnotation={addAnnotation} />
-        {/* DailyGoals will be rendered in the next commit */}
-        <div className="glass-panel p-5 rounded-2xl border border-indigo-500/5 bg-slate-900/10 flex items-center justify-center text-slate-500 text-xs italic">
-          Target goals panel pending installation...
-        </div>
+        <DailyGoals dailyGoal={dailyGoal} />
       </div>
 
       {/* 6. Lower statistics charts (Bar chart + Donut chart) */}
@@ -562,6 +566,11 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Guided Stretches Overlay */}
+      {showBreaksModal && (
+        <BreaksPanel onClose={() => setShowBreaksModal(false)} />
       )}
 
     </div>
