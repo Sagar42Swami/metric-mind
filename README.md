@@ -91,6 +91,41 @@ This console provides interactive cognitive exercises and live interface modifie
    - If stress indicators exceed safety limits for more than 5 ticks, or if you click the Shield alert button in the header, the **Micro-Break stretches modal** overlay appears.
    - Follow the steps to relax your neck, roll your shoulders, look away from the screen, and stretch your wrists.
 
+## 🔌 Software Architecture & Pub/Sub Data Pipeline
+
+Mind Metric uses a structured **Publisher-Subscriber pattern** to separate raw biometric data generation from the React rendering cycle.
+
+### Data Flow Flowchart
+```mermaid
+graph TD
+    A[dataEngine.js - Class Publisher] -->|Broadcasts JSON updates| B[useLiveMetrics.js - React Hook Subscriber]
+    B -->|Provides dynamic context| C[Dashboard.jsx - Container Component]
+    C -->|Passes state props| D[StreamChart.jsx - Recharts graph]
+    C -->|Passes state props| E[LiveGauge.jsx - KPI dial]
+    C -->|Passes state props| F[AmbientAudio.jsx - Sound synthesizer]
+```
+
+### Swapping the Simulator for Physical Headbands (EEG)
+To transition this simulator into a production setup using real wearable hardware (e.g. Muse or Emotiv headbands), you only need to update the `start()` method inside [dataEngine.js](file:///f:/var/aaaaa/metric-mind/src/lib/dataEngine.js):
+
+1. **Connect via Web Bluetooth API**:
+   ```javascript
+   async startBluetoothSensor() {
+     const device = await navigator.bluetooth.requestDevice({
+       filters: [{ namePrefix: 'Muse' }]
+     });
+     const server = await device.gatt.connect();
+     // Subscribe to characteristic notification feeds ...
+   }
+   ```
+2. **Push Characteristics to Subscribers**:
+   As sensor characteristics trigger events, map the raw microvolts data into Focus/Stress metrics and call:
+   ```javascript
+   this.subscribers.forEach(callback => callback(newBiometricPacket));
+   ```
+3. **No UI refactoring required**:
+   Because [useLiveMetrics.js](file:///f:/var/aaaaa/metric-mind/src/hooks/useLiveMetrics.js) and the dashboard visual panels only consume the `subscribe()` listener, they will render live biometric values immediately!
+
 ---
 
 ## 🛠️ Tech Stack
