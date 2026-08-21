@@ -132,3 +132,128 @@ export const playTelemetrySound = (severity) => {
     console.error("Audio Context initialization failed", err);
   }
 };
+
+// Ambient noise and binaural beat synthesizer state
+let ambientCtx = null;
+let noiseNode = null;
+let binauralOscLeft = null;
+let binauralOscRight = null;
+let filterNode = null;
+
+// Start playing focus binaural tones or brownian noise
+export const startAmbientSound = (type, focusVal = 70) => {
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    
+    stopAmbientSound();
+    
+    if (!ambientCtx || ambientCtx.state === 'closed') {
+      ambientCtx = new AudioContextClass();
+    }
+    
+    // Resume context if browser suspended it
+    if (ambientCtx.state === 'suspended') {
+      ambientCtx.resume();
+    }
+
+    if (type === 'pink_noise') {
+      // Warm brownian/pink noise approximation buffer
+      const bufferSize = 4 * ambientCtx.sampleRate;
+      const buffer = ambientCtx.createBuffer(1, bufferSize, ambientCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let lastOut = 0.0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        // Leaky integration filter for low-pass brown noise feel
+        data[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = data[i];
+        data[i] *= 3.5; // Gain scaling
+      }
+
+      noiseNode = ambientCtx.createBufferSource();
+      noiseNode.buffer = buffer;
+      noiseNode.loop = true;
+
+      filterNode = ambientCtx.createBiquadFilter();
+      filterNode.type = 'lowpass';
+      // Dynamically filter focus: higher focus = clearer high frequencies
+      filterNode.frequency.setValueAtTime(200 + (focusVal * 10), ambientCtx.currentTime);
+
+      const gain = ambientCtx.createGain();
+      gain.gain.setValueAtTime(0.08, ambientCtx.currentTime);
+
+      noiseNode.connect(filterNode);
+      filterNode.connect(gain);
+      gain.connect(ambientCtx.destination);
+      noiseNode.start();
+    } else if (type === 'binaural') {
+      // Binaural beats: 150Hz left ear, 150 + offset (e.g. 10Hz alpha) right ear
+      const beatOffset = focusVal >= 85 ? 10 : focusVal >= 60 ? 6 : 4; // Alpha, Theta, or Delta
+      
+      binauralOscLeft = ambientCtx.createOscillator();
+      binauralOscRight = ambientCtx.createOscillator();
+      
+      binauralOscLeft.type = 'sine';
+      binauralOscLeft.frequency.setValueAtTime(150, ambientCtx.currentTime);
+      
+      binauralOscRight.type = 'sine';
+      binauralOscRight.frequency.setValueAtTime(150 + beatOffset, ambientCtx.currentTime);
+
+      const merger = ambientCtx.createChannelMerger(2);
+      const gainL = ambientCtx.createGain();
+      const gainR = ambientCtx.createGain();
+      
+      gainL.gain.setValueAtTime(0.04, ambientCtx.currentTime);
+      gainR.gain.setValueAtTime(0.04, ambientCtx.currentTime);
+
+      binauralOscLeft.connect(gainL).connect(merger, 0, 0);
+      binauralOscRight.connect(gainR).connect(merger, 0, 1);
+
+      const masterGain = ambientCtx.createGain();
+      masterGain.gain.setValueAtTime(0.2, ambientCtx.currentTime);
+
+      merger.connect(masterGain).connect(ambientCtx.destination);
+      
+      binauralOscLeft.start();
+      binauralOscRight.start();
+    }
+  } catch (err) {
+    console.error("Failed to compile ambient audio synthesizer", err);
+  }
+};
+
+// Dynamically alter lowpass filter or beats frequency based on Focus
+export const updateAmbientFrequency = (focusVal) => {
+  try {
+    if (!ambientCtx || ambientCtx.state !== 'running') return;
+    
+    if (filterNode) {
+      // Modulate low-pass filter cutoff
+      filterNode.frequency.exponentialRampToValueAtTime(200 + (focusVal * 10), ambientCtx.currentTime + 0.5);
+    }
+    if (binauralOscRight) {
+      const beatOffset = focusVal >= 85 ? 10 : focusVal >= 60 ? 6 : 4;
+      binauralOscRight.frequency.exponentialRampToValueAtTime(150 + beatOffset, ambientCtx.currentTime + 0.5);
+    }
+  } catch (e) {}
+};
+
+// Stop audio scapes
+export const stopAmbientSound = () => {
+  try {
+    if (noiseNode) {
+      noiseNode.stop();
+      noiseNode = null;
+    }
+    if (binauralOscLeft) {
+      binauralOscLeft.stop();
+      binauralOscLeft = null;
+    }
+    if (binauralOscRight) {
+      binauralOscRight.stop();
+      binauralOscRight = null;
+    }
+    filterNode = null;
+  } catch (e) {}
+};
