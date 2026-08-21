@@ -6,6 +6,34 @@ Designed with a decoupled **Publisher-Subscriber architecture**, the interface i
 
 ---
 
+## 📂 Directory Layout
+
+```text
+metric-mind/
+├── src/
+│   ├── components/         # Presentation HUD widgets and panels
+│   │   ├── AmbientAudio.jsx # Focus ambient noise controller
+│   │   ├── Annotations.jsx  # Context notes logging card
+│   │   ├── BreaksPanel.jsx  # Guided breaks posture modal
+│   │   ├── DailyGoals.jsx   # Goal progress & coherence streaks
+│   │   ├── Dashboard.jsx    # Core controller container
+│   │   ├── Header.jsx       # Global navigation controls
+│   │   ├── KPICard.jsx      # Telemetry display cards
+│   │   ├── LiveGauge.jsx    # Pie dial real-time status gauge
+│   │   └── StreamChart.jsx  # Recharts streaming area visuals
+│   ├── hooks/
+│   │   └── useLiveMetrics.js# Core subscription hook
+│   ├── lib/
+│   │   ├── dataEngine.js    # Simulation publisher class
+│   │   └── utils.js         # Sound alert synthesizer utilities
+│   ├── App.jsx              # Main app bootstrapper
+│   └── index.css            # Custom theme variables
+├── README.md                # System documentation
+└── package.json
+```
+
+---
+
 ## 🚀 Interactive Features List
 
 ### 1. Dynamic Simulation Presets (Profiles)
